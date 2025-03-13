@@ -1,0 +1,14 @@
+name: 堆糖去广告
+desc: 移除开屏广告、信息流广告、热搜排行榜广告、我的页面横幅广告，移除关注推荐。
+icon: https://gitlab.com/lodepuly/iconlibrary/-/raw/main/App_icon/120px/DuiTang.png
+category: 去广告
+date: "2024-08-03 10:44:14"
+rules:
+- DOMAIN-KEYWORD,eplan,DIRECT
+- DOMAIN-KEYWORD,atlassian,DIRECT
+
+- DOMAIN-KEYWORD,binance,\U0001F4AC OpenAi
+
+
+- DOMAIN,imap.gmail.com,DIRECT
+- DOMAIN,smtp.gmail.com,DIRECT
