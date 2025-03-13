@@ -1,14 +1,13 @@
+---
 name: CX stash overwrite
 desc: CX stash overwrite
-icon:
-category: 
-date: "2025-03-13 10:44:14"
+icon: null
+category: null
+date: 2025-03-13 10:44:14
 rules:
-- DOMAIN-KEYWORD,eplan,DIRECT
-- DOMAIN-KEYWORD,atlassian,DIRECT
+  - DOMAIN-KEYWORD,eplan,DIRECT
+  - DOMAIN-KEYWORD,atlassian,DIRECT
+  - DOMAIN-KEYWORD,binance,\U0001F4AC OpenAi
+  - DOMAIN,imap.gmail.com,DIRECT
+  - DOMAIN,smtp.gmail.com,DIRECT
 
-- DOMAIN-KEYWORD,binance,\U0001F4AC OpenAi
-
-
-- DOMAIN,imap.gmail.com,DIRECT
-- DOMAIN,smtp.gmail.com,DIRECT
