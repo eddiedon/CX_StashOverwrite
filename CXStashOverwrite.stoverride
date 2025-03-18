@@ -4,6 +4,7 @@ desc: CX stash overwrite
 rules:
   - DOMAIN-KEYWORD,eplan,DIRECT
   - DOMAIN-KEYWORD,atlassian,DIRECT
+  - DOMAIN-KEYWORD,atl-paas,DIRECT
   - DOMAIN-KEYWORD,binance,\U0001F4AC OpenAi
   - DOMAIN,imap.gmail.com,DIRECT
   - DOMAIN,smtp.gmail.com,DIRECT
