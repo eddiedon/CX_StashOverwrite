@@ -6,7 +6,7 @@ rules:
 ##  - DOMAIN-KEYWORD,atlassian,DIRECT
 ##  - DOMAIN-KEYWORD,atl-paas,DIRECT
   - DOMAIN-KEYWORD,codesys,DIRECT
-  - DOMAIN-KEYWORD,binance,\U0001F4AC OpenAi
+  - DOMAIN-KEYWORD,binance,💬 Ai平台
 ##  - DOMAIN,imap.gmail.com,DIRECT
 ##  - DOMAIN,smtp.gmail.com,DIRECT
 
