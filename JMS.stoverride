@@ -13,11 +13,12 @@ desc: |
   注入 Loyalsoldier 规则集 + 6 个策略组。
   节点随官方订阅自动更新。
 
-# --- DNS（订阅无 DNS 段，此处注入三层架构：引导→主DNS→备用DNS）---
+# --- DNS（Stash 原生方案：并发 nameserver + fake-ip）---
+# Stash 不用 fallback/fallback-filter；也不开 follow-rule（官方警告影响 CDN 优化）。
+# Stash 自带并发查询+最快响应，配合 fake-ip：被墙域名由代理节点解析，足够干净。
 dns:
   enable: true
   ipv6: false
-  listen: 0.0.0.0:53
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   default-nameserver:
@@ -26,15 +27,6 @@ dns:
   nameserver:
     - https://doh.pub/dns-query
     - https://dns.alidns.com/dns-query
-  fallback:
-    - https://dns.google/dns-query
-    - https://cloudflare-dns.com/dns-query
-    - https://dns.twnic.tw/dns-query
-  fallback-filter:
-    geoip: true
-    geoip-code: CN
-    ipcidr:
-      - 240.0.0.0/4
 
 # --- 策略组（#!replace：完全替换订阅自带的 JMS / JMS Auto）---
 # include-all: true 引用订阅全部节点（本订阅恰好就是 6 个 JMS 节点）
