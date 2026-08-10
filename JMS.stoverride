@@ -1,0 +1,191 @@
+# ================================================================
+# Stash 覆写文件 (Override) · 配合 JMS 官方 Mihomo/Clash.Meta YAML 订阅
+# ----------------------------------------------------------
+# 用法：Stash 中把官方订阅链接作为 Profile 导入，再启用本覆写文件。
+#   官方订阅: ...&format=clash  (提供 6 个节点：2 ss + 4 vless-reality)
+#   本覆写  : 注入 Loyalsoldier 黑名单分流 + 6 个策略组
+# 节点随官方订阅自动更新，无需手动维护。
+# 黑名单模式：默认直连，仅被墙流量走代理。
+# ================================================================
+name: JMS · Loyalsoldier 黑名单分流
+desc: |
+  覆盖 JMS 订阅默认的全代理策略 (MATCH,JMS)。
+  注入 Loyalsoldier 规则集 + 6 个策略组。
+  节点随官方订阅自动更新。
+
+# --- DNS（订阅无 DNS 段，此处注入三层架构：引导→主DNS→备用DNS）---
+dns:
+  enable: true
+  ipv6: false
+  listen: 0.0.0.0:53
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  nameserver:
+    - https://doh.pub/dns-query
+    - https://dns.alidns.com/dns-query
+  fallback:
+    - https://dns.google/dns-query
+    - https://cloudflare-dns.com/dns-query
+    - https://dns.twnic.tw/dns-query
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    ipcidr:
+      - 240.0.0.0/4
+
+# --- 策略组（#!replace：完全替换订阅自带的 JMS / JMS Auto）---
+# include-all: true 引用订阅全部节点（本订阅恰好就是 6 个 JMS 节点）
+proxy-groups: #!replace
+  # 1. 手动选择节点
+  - name: 🚀 节点选择
+    type: select
+    proxies:
+      - ♻️ 自动选择
+      - DIRECT
+    include-all: true
+
+  # 2. 自动选最低延迟节点
+  - name: ♻️ 自动选择
+    type: url-test
+    include-all: true
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+
+  # 3. Apple + iCloud（默认直连，可切代理或指定节点）
+  - name: 🍎 苹果服务
+    type: select
+    proxies:
+      - DIRECT
+      - 🚀 节点选择
+      - ♻️ 自动选择
+    include-all: true
+
+  # 4. 广告拦截（默认 REJECT，可放行）
+  - name: 🛑 广告拦截
+    type: select
+    proxies:
+      - REJECT
+      - DIRECT
+
+  # 5. 直连（默认 DIRECT，可切代理或指定节点）
+  - name: 🎯 全球直连
+    type: select
+    proxies:
+      - DIRECT
+      - 🚀 节点选择
+      - ♻️ 自动选择
+    include-all: true
+
+  # 6. 兜底（黑名单模式默认走代理，可切直连）
+  - name: 🐟 漏网之鱼
+    type: select
+    proxies:
+      - 🚀 节点选择
+      - ♻️ 自动选择
+      - DIRECT
+    include-all: true
+
+# --- 规则集 (rule-providers，Loyalsoldier clash-rules，每日自动更新) ---
+rule-providers:
+  reject:
+    behavior: domain
+    format: yaml
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt
+    interval: 86400
+  private:
+    behavior: domain
+    format: yaml
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt
+    interval: 86400
+  apple:
+    behavior: domain
+    format: yaml
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt
+    interval: 86400
+  icloud:
+    behavior: domain
+    format: yaml
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt
+    interval: 86400
+  google:
+    behavior: domain
+    format: yaml
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt
+    interval: 86400
+  proxy:
+    behavior: domain
+    format: yaml
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt
+    interval: 86400
+  direct:
+    behavior: domain
+    format: yaml
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt
+    interval: 86400
+  gfw:
+    behavior: domain
+    format: yaml
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt
+    interval: 86400
+  tld-not-cn:
+    behavior: domain
+    format: yaml
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt
+    interval: 86400
+  telegramcidr:
+    behavior: ipcidr
+    format: yaml
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt
+    interval: 86400
+  cncidr:
+    behavior: ipcidr
+    format: yaml
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt
+    interval: 86400
+  lancidr:
+    behavior: ipcidr
+    format: yaml
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt
+    interval: 86400
+  applications:
+    behavior: classical
+    format: yaml
+    url: https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt
+    interval: 86400
+
+# --- 规则（#!replace：黑名单模式，完全替换订阅的 MATCH,JMS）---
+# 顺序：Clash 从上到下匹配，命中即停止
+rules: #!replace
+  # ① 私有网络 & 局域网
+  - RULE-SET,private,🎯 全球直连
+  - RULE-SET,lancidr,🎯 全球直连
+  # ② 广告 & 跟踪 → 拦截
+  - RULE-SET,reject,🛑 广告拦截
+  # ③ 常见软件（国内应用）→ 直连
+  - RULE-SET,applications,🎯 全球直连
+  # ④ Apple & iCloud → 苹果服务（默认直连）
+  - RULE-SET,apple,🍎 苹果服务
+  - RULE-SET,icloud,🍎 苹果服务
+  # ⑤ Google → 代理
+  - RULE-SET,google,🚀 节点选择
+  # ⑥ GFW 封锁列表 → 代理
+  - RULE-SET,gfw,🚀 节点选择
+  # ⑦ Telegram IP → 代理
+  - RULE-SET,telegramcidr,🚀 节点选择
+  # ⑧ 非中国顶级域名 → 代理
+  - RULE-SET,tld-not-cn,🚀 节点选择
+  # ⑨ 额外代理列表 → 代理
+  - RULE-SET,proxy,🚀 节点选择
+  # ⑩ 直连域名列表 → 直连
+  - RULE-SET,direct,🎯 全球直连
+  # ⑪ 中国 IP 段 → 直连
+  - RULE-SET,cncidr,🎯 全球直连
+  - GEOIP,CN,🎯 全球直连
+  # ⑫ 局域网 IP → 直连
+  - GEOIP,LAN,🎯 全球直连
+  # ⑬ 兜底：未命中任何规则的流量
+  - MATCH,🐟 漏网之鱼
